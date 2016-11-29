@@ -3,6 +3,7 @@
 # INPUT ENV
 #   GIT_REPO (required)
 #   SSH_KEY  (required if GIT_REPO using ssh protocol)
+#   MAIN     (required if start script is not app.js)
 
 APP_NAME=webapp
 APP_HOME=/home/app
@@ -22,13 +23,18 @@ EOF
 
 cd $APP_HOME
 
-if [[ -d $APP_DIR/.git ]]; then
+if [ -d $APP_DIR/.git ]; then
   echo "webapp already exist"
 else
   git clone $GIT_REPO --branch $GIT_BRANCH --depth 1 $APP_NAME
 fi
 
+cd $APP_DIR
+
+if [ $MAIN ] && [ $MAIN != "app.js" ]; then
+  ln -sf $MAIN app.js
+fi
+
 chown -R app:app $APP_DIR
 
-cd $APP_DIR
 su - app -c "cd $APP_DIR; npm install"
